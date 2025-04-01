@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class EnvConfig {
     private static final Dotenv dotenv = Dotenv.configure()
-            .directory("src")
+            .directory(System.getProperty("user.dir"))
             .ignoreIfMissing()
             .load();
 
