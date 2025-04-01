@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @OpenAPIDefinition(
-        info = @Info(title = "Auth_Api_MykareAssessment", version="1.0", description = "Api Documentation"),
+        info = @Info(title = "Auth_Api_MykareAssessment", version="1.0", description = "Api Documentation for basic user authentication service"),
         security = @SecurityRequirement(name = "bearerAuth")
 )
 @SecurityScheme(

@@ -34,7 +34,10 @@ public class JwtFilter extends OncePerRequestFilter {
         System.out.println("Incoming request: " + requestURI);
 
         // Bypass filter for login and register
-        if (requestURI.contains("/api/auth/register") || requestURI.contains("/api/auth/login")) {
+        if (requestURI.contains("/api/auth/register") ||
+                requestURI.contains("/api/auth/login") ||
+                requestURI.startsWith("/swagger-ui") ||
+                requestURI.startsWith("/v3/api-docs")) {
             chain.doFilter(request, response);
             return;
         }

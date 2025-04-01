@@ -4,6 +4,8 @@ package Controller;
 import Config.JwtUtil;
 import Entity.User;
 import Service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,11 +19,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/users")
 @CrossOrigin(origins = "*")
+@Tag(name = "User Management", description = "APIs for managing users")
 public class UserController {
 
     @Autowired
     private AuthService authService;
-
+    @Operation(summary = "Get all users", description = "Returns a list of all registered users. Admin role required.")
     @GetMapping("/get-users")
     public ResponseEntity<?> getAllUsers(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
         try {
@@ -38,7 +41,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
     }
-
+    @Operation(summary = "Delete a user", description = "Deletes a user by email. Only admins can perform this action.")
     @DeleteMapping("/delete-user")
     public ResponseEntity<?> deleteUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String token, @RequestParam String email) {
         try {
