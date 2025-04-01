@@ -2,36 +2,38 @@ package Config;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
-import java.util.Base64;
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.function.Function;
 
 @Component
 public class JwtUtil {
-    private static final String SECRET_KEY = Base64.getEncoder().encodeToString("your-very-secret-key-which-is-32-bytes-long".getBytes());
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hour
-
-    private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    @Value("${jwt.secret}")
+    private String secretKey;
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
+    private static final long EXPIRATION_TIME = 1000 * 60 * 5;
+
 
     public String generateToken(String email) {
         return Jwts.builder()
-                .setSubject(email)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .subject(email)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(getSigningKey(), Jwts.SIG.HS256)
                 .compact();
     }
 
     public boolean validateToken(String token, String email) {
         try {
             return email.equals(extractEmail(token)) && !isTokenExpired(token);
-        } catch (ExpiredJwtException | MalformedJwtException | SignatureException | UnsupportedJwtException e) {
-            return false;  // Invalid or expired token
+        } catch (JwtException e) {
+            return false;
         }
     }
 
@@ -48,11 +50,13 @@ public class JwtUtil {
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
+        Claims claims = Jwts.parser()
+                .verifyWith(getSigningKey())
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
         return claimsResolver.apply(claims);
     }
+
+
 }
