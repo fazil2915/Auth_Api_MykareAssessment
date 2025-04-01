@@ -15,7 +15,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 @Service
@@ -72,8 +74,39 @@ public class AuthService {
             throw new InvalidCredentialsException("Invalid email or password");
         }
 
-        String token = jwtUtil.generateToken(user.getEmail());
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
 
         return new LoginResponse(token, "Login successful");
     }
+
+    public List<User> getAllUsers(String token)  {
+        String role = jwtUtil.extractRole(token);
+
+        if (!"ADMIN".equals(role)) {
+            throw new RuntimeException("Access Denied: Only admins can view users");
+        }
+        return userRepository.findAll();
+    }
+
+    public boolean deleteUserByEmail(String token, String email) {
+        String role = jwtUtil.extractRole(token);
+        String requestingEmail = jwtUtil.extractEmail(token);
+
+        Optional<User> requestingUser = userRepository.findByEmail(requestingEmail);
+
+        if (requestingUser.isPresent() && "ADMIN".equals(role)) {
+            Optional<User> userToDelete = userRepository.findByEmail(email);
+
+            if (userToDelete.isPresent()) {
+                userRepository.delete(userToDelete.get());
+                return true;
+            } else {
+                System.out.println(" User to delete not found: " + email);
+            }
+        } else {
+            System.out.println(" Requesting User is not an ADMIN");
+        }
+        return false;
+    }
+
 }

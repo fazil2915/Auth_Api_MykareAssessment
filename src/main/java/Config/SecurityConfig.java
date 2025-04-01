@@ -10,7 +10,6 @@
     import org.springframework.security.config.annotation.web.builders.HttpSecurity;
     import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
     import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-    import org.springframework.security.config.http.SessionCreationPolicy;
     import org.springframework.security.core.userdetails.User;
     import org.springframework.security.core.userdetails.UserDetailsService;
     import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,12 +23,13 @@
     @EnableWebSecurity
     public class SecurityConfig {
 
-        private final JwtFilter jwtFilter;
-        private final CorsConfig corsConfig; // ✅ No UserDetailsService in constructor
+        private final JwtUtil jwtUtil;
+        private final JwtFilter jwtFilter; // Inject the JwtFilter
 
-        public SecurityConfig(JwtFilter jwtFilter, CorsConfig corsConfig) {
+        // Constructor injection for JwtUtil and JwtFilter
+        public SecurityConfig(JwtUtil jwtUtil, JwtFilter jwtFilter) {
+            this.jwtUtil = jwtUtil;
             this.jwtFilter = jwtFilter;
-            this.corsConfig = corsConfig;
         }
 
         @Bean
@@ -47,6 +47,7 @@
                             ).permitAll()
                             .anyRequest().authenticated()
                     )
+                    .authenticationProvider(authenticationProvider()) // UserDetailsService is used here
                     .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
             return http.build();
@@ -56,7 +57,7 @@
         public AuthenticationProvider authenticationProvider() {
             DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
             provider.setPasswordEncoder(passwordEncoder());
-            provider.setUserDetailsService(userDetailsService()); // Uses the bean method instead of constructor injection
+            provider.setUserDetailsService(userDetailsService()); // UserDetailsService is used here
             return provider;
         }
 
@@ -71,7 +72,7 @@
         }
 
         @Bean
-        public UserDetailsService userDetailsService() { //Defines the bean without constructor injection
+        public UserDetailsService userDetailsService() {
             return new InMemoryUserDetailsManager(
                     User.withUsername("admin")
                             .password(passwordEncoder().encode("password"))

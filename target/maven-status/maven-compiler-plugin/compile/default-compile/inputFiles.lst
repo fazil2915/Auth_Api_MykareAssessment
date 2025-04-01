@@ -6,6 +6,7 @@
 /home/fazil-rahman/Desktop/Auth_Api_MykareAssessment/src/main/java/Config/SecurityConfig.java
 /home/fazil-rahman/Desktop/Auth_Api_MykareAssessment/src/main/java/Config/SwaggerConfig.java
 /home/fazil-rahman/Desktop/Auth_Api_MykareAssessment/src/main/java/Controller/AuthController.java
+/home/fazil-rahman/Desktop/Auth_Api_MykareAssessment/src/main/java/Controller/UserController.java
 /home/fazil-rahman/Desktop/Auth_Api_MykareAssessment/src/main/java/Dto/AuthResponse.java
 /home/fazil-rahman/Desktop/Auth_Api_MykareAssessment/src/main/java/Dto/LoginRequest.java
 /home/fazil-rahman/Desktop/Auth_Api_MykareAssessment/src/main/java/Dto/LoginResponse.java
