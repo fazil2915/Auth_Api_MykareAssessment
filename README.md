@@ -10,6 +10,7 @@ This project is a Spring Boot-based authentication API with JWT authentication a
 - PostgreSQL database
 - Docker support
 - Swagger API documentation
+- Unit test cases
 
 ## Prerequisites
 Ensure you have the following installed:
